@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/spf13/cobra"
 	ldsview "github.com/kgoins/ldsview/pkg"
+	"github.com/spf13/cobra"
 )
 
 // uacCmd represents the uac command
@@ -21,8 +21,15 @@ var uacCmd = &cobra.Command{
 			return
 		}
 
-		uacFlags := ldsview.GetFlagsFromUAC(uacInt)
-		fmt.Println(uacFlags.String())
+		uacFlags, err := ldsview.GetFlagsFromUAC(uacInt)
+		if err != nil {
+			fmt.Println("Unable to parse UAC: ", err)
+			return
+		}
+
+		for _, flag := range uacFlags {
+			fmt.Println(flag)
+		}
 	},
 }
 
