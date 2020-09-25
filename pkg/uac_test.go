@@ -4,10 +4,17 @@ import (
 	"bytes"
 	"crypto/md5"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func NewTestEntities() []Entity {
+	entityLines := strings.Split(EntityStr, "\n")[1:]
+	entity := BuildEntity(entityLines)
+	return []Entity{entity}
+}
 
 func TestUACPrint(t *testing.T) {
 	t.Run("prints correct sorted output", func(t *testing.T) {
@@ -37,23 +44,17 @@ func TestUACParse(t *testing.T) {
 }
 
 func TestUACSearch(t *testing.T) {
-	t.Run("returns an error when passed an invalid <file> param", func(t *testing.T) {
-		got, err := UACSearch("noop", 512)
-		assert.Nil(t, got)
-		assert.NotNil(t, err)
-	})
-
-	t.Run("returns an error when passed an invalid <uacProp> param", func(t *testing.T) {
-		//TODO:needs in/valid ldif test fixture
-	})
+	entities := NewTestEntities()
 
 	t.Run("returns a correct entity when there is a match preset", func(t *testing.T) {
-		//TODO:needs in/valid ldif test fixture
-		// got, err := UACSearch("test.ldif", 512)
+		got := UACSearch(&entities, 512)
+		want := entities
+		assert.ElementsMatch(t, want, got)
 	})
 
 	t.Run("returns no entity when no match is preset", func(t *testing.T) {
-		//TODO:needs in/valid ldif test fixture
-		// got, err := UACSearch("test.ldif", 1)
+		got := UACSearch(&entities, 513)
+		want := make([]Entity, 0)
+		assert.ElementsMatch(t, want, got)
 	})
 }

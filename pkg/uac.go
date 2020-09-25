@@ -16,15 +16,8 @@ func GetFlagsFromUAC(uac int64) ([]string, error) {
 }
 
 // UACSearch will seek for entities who have the given UAC property set
-func UACSearch(file string, uacProp int) (matches []Entity, err error) {
-
-	ldifFile := NewLdifParser(file)
-	entities, err := ldifFile.BuildEntities()
-	if err != nil {
-		return
-	}
-
-	for _, entity := range entities {
+func UACSearch(entities *[]Entity, uacProp int) (matches []Entity) {
+	for _, entity := range *entities {
 		uac, found := entity.GetAttribute("userAccountControl")
 		if !found {
 			continue
@@ -32,11 +25,11 @@ func UACSearch(file string, uacProp int) (matches []Entity, err error) {
 
 		uacStr := uac.Value.GetSingleValue()
 		i64, _ := strconv.ParseInt(uacStr, 10, 32)
-		good, err := msldapuac.IsSet(i64, uacProp)
+		isMatch, err := msldapuac.IsSet(i64, uacProp)
 		if err != nil {
 			continue
 		}
-		if good {
+		if isMatch {
 			matches = append(matches, entity)
 		}
 	}

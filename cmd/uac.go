@@ -24,11 +24,14 @@ var uacCmd = &cobra.Command{
 		shouldSearch, _ := cmd.Flags().GetInt("search")
 		if shouldSearch != 0 {
 			file, _ := cmd.Flags().GetString("file")
-			matches, err := ldsview.UACSearch(file, shouldSearch)
+			ldifFile := ldsview.NewLdifParser(file)
+			entities, err := ldifFile.BuildEntities()
 			if err != nil {
-				cmd.PrintErr("Error while searching for for UAC flag: ", err)
+				cmd.PrintErr("Error while parsing entities: ", err)
 				return
 			}
+
+			matches := ldsview.UACSearch(&entities, shouldSearch)
 			for _, match := range matches {
 				PrintEntity(match)
 			}
