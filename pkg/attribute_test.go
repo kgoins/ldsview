@@ -1,15 +1,13 @@
-package ldsview_test
+package ldsview
 
 import (
 	"testing"
-
-	ldsview "github.com/kgoins/ldsview/pkg"
 )
 
 func TestAttribute_BuildFromValidLine(t *testing.T) {
 	attrLine := "userAccountControl: 66048"
 
-	attr, err := ldsview.BuildAttributeFromLine(attrLine)
+	attr, err := BuildAttributeFromLine(attrLine)
 	if err != nil {
 		t.Fatalf("Unable to build from valid attr line")
 	}

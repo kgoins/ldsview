@@ -1,37 +1,31 @@
-package ldsview_test
+package ldsview
 
 import (
 	"testing"
 
-	ldsview "github.com/kgoins/ldsview/pkg"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestLdifParser_CountEntities(t *testing.T) {
-	parser := ldsview.NewLdifParser(TESTFILE)
+var parser = NewLdifParser(TESTFILE)
 
-	count, err := parser.CountEntities()
-	if err != nil {
-		t.Fatalf("unable to parse test file")
-	}
+func TestLdifParser(t *testing.T) {
 
-	if count != 5 {
-		t.Fatalf("Failed to count entities")
-	}
-}
+	t.Run("counts the ldif objects correctly", func(t *testing.T) {
+		want := 2
+		got, err := parser.CountEntities()
+		assert.Equal(t, want, got)
+		assert.Nil(t, err)
+	})
 
-func TestLdifParser_CountEntitiesWithFilter(t *testing.T) {
-	parser := ldsview.NewLdifParser(TESTFILE)
+	t.Run("counts the filtered ldif objects correctly", func(t *testing.T) {
+		entityFilterStr := []string{"objectClass:=computer"}
+		entityFilter, _ := BuildEntityFilter(entityFilterStr)
+		parser.SetEntityFilter(entityFilter)
 
-	entityFilterStr := []string{"objectClass:=computer"}
-	entityFilter, _ := ldsview.BuildEntityFilter(entityFilterStr)
-	parser.SetEntityFilter(entityFilter)
+		want := 1
+		got, err := parser.CountEntities()
+		assert.Equal(t, want, got)
+		assert.Nil(t, err)
+	})
 
-	count, err := parser.CountEntities()
-	if err != nil {
-		t.Fatalf("unable to parse test file")
-	}
-
-	if count != 1 {
-		t.Fatalf("Failed to count filtered entities")
-	}
 }

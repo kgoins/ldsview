@@ -3,11 +3,10 @@ package ldsview
 import (
 	"strings"
 	"testing"
-
-	ldsview "github.com/kgoins/ldsview/pkg"
 )
 
-var EntityStr string = `# MYUSR, ContosoUsers, contoso.com
+var EntityStr = `
+# MYUSR, ContosoUsers, contoso.com
 dn: CN=MYUSR,OU=ContosoUsers,DC=contoso,DC=com
 objectClass: top
 objectClass: person
@@ -44,12 +43,13 @@ dSCorePropagationData: 20190407190910.0Z
 dSCorePropagationData: 20190311163932.0Z
 dSCorePropagationData: 16010714223649.0Z
 lastLogonTimestamp: 130674899604502606
+
 `
 
 func TestEntity_BuildEntity(t *testing.T) {
 	entityLines := strings.Split(EntityStr, "\n")[1:]
 
-	entity := ldsview.BuildEntity(entityLines)
+	entity := BuildEntity(entityLines)
 
 	if entity.IsEmpty() {
 		t.Fatalf("failed to parse entity")
@@ -73,9 +73,9 @@ func TestEntity_BuildEntityWithAttrFilter(t *testing.T) {
 		"userPrincipalName",
 		"objectClass",
 	}
-	attrFilter := ldsview.BuildAttributeFilter(attrsList)
+	attrFilter := BuildAttributeFilter(attrsList)
 
-	entity := ldsview.BuildEntityFromAttrList(entityLines, &attrFilter)
+	entity := BuildEntityFromAttrList(entityLines, &attrFilter)
 
 	if entity.IsEmpty() {
 		t.Fatalf("failed to parse entity")

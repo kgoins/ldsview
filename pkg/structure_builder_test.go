@@ -1,15 +1,13 @@
-package ldsview_test
+package ldsview
 
 import (
 	"testing"
-
-	ldsview "github.com/kgoins/ldsview/pkg"
 )
 
 func TestStructureBuilder_GetStructure(t *testing.T) {
-	parser := ldsview.NewLdifParser(TESTFILE)
+	parser := NewLdifParser(TESTFILE)
 
-	structure, err := ldsview.GetStructure(&parser)
+	structure, err := GetStructure(&parser)
 	if err != nil {
 		t.Fatalf("failed to parse ldif for domain structure")
 	}
