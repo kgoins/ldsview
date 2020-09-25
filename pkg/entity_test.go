@@ -1,4 +1,4 @@
-package ldsview_test
+package ldsview
 
 import (
 	"strings"
@@ -7,7 +7,7 @@ import (
 	ldsview "github.com/kgoins/ldsview/pkg"
 )
 
-var entityStr string = `# MYUSR, ContosoUsers, contoso.com
+var EntityStr string = `# MYUSR, ContosoUsers, contoso.com
 dn: CN=MYUSR,OU=ContosoUsers,DC=contoso,DC=com
 objectClass: top
 objectClass: person
@@ -30,7 +30,7 @@ userAccountControl: 66048
 codePage: 0
 countryCode: 0
 pwdLastSet: 129857191591306845
-primaryGroupID: 513
+primaryGroupID: 805306368
 objectSid:: AQUAAAAAAAUVAAAAa9ZiBBbA6jKDPStVYiIMAA==
 accountExpires: 9223372036854775807
 sAMAccountName: MYUSR
@@ -47,7 +47,7 @@ lastLogonTimestamp: 130674899604502606
 `
 
 func TestEntity_BuildEntity(t *testing.T) {
-	entityLines := strings.Split(entityStr, "\n")[1:]
+	entityLines := strings.Split(EntityStr, "\n")[1:]
 
 	entity := ldsview.BuildEntity(entityLines)
 
@@ -66,7 +66,7 @@ func TestEntity_BuildEntity(t *testing.T) {
 }
 
 func TestEntity_BuildEntityWithAttrFilter(t *testing.T) {
-	entityLines := strings.Split(entityStr, "\n")[1:]
+	entityLines := strings.Split(EntityStr, "\n")[1:]
 
 	attrsList := []string{
 		"samaccountname",
