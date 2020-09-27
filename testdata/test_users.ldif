@@ -1,0 +1,85 @@
+# extended LDIF
+#
+# LDAPv3
+# base <DC=contoso,DC=com> with scope subtree
+# filter: (objectclass=*)
+# requesting: ALL
+# with pagedResults control: size=5000
+#
+
+# MYUSR, ContosoUsers, contoso.com
+dn: CN=MYUSR,OU=ContosoUsers,DC=contoso,DC=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: user
+cn: MYUSR
+givenName: MYUSR
+distinguishedName: CN=MYUSR,OU=ContosoUsers,DC=contoso,DC=com
+instanceType: 4
+whenCreated: 20120423175240.0Z
+whenChanged: 20190225044802.0Z
+displayName: MYUSR
+uSNCreated: 793245
+memberOf: CN=vault_users,OU=Global,OU=Security,OU=Groups,DC=contoso,DC=com
+memberOf: CN=PWD Complexity,OU=Security,OU=Groups,DC=contoso,DC=com
+uSNChanged: 1076364863
+name: MYUSR
+objectGUID:: 7OBfD10nQkSVYY8UHCV2aQ==
+userAccountControl: 66048
+codePage: 0
+countryCode: 0
+pwdLastSet: 129857191591306845
+primaryGroupID: 805306368
+objectSid:: AQUAAAAAAAUVAAAAa9ZiBBbA6jKDPStVYiIMAA==
+accountExpires: 9223372036854775807
+sAMAccountName: MYUSR
+sAMAccountType: 805306368
+userPrincipalName: MYUSR@contoso.com
+lockoutTime: 0
+objectCategory: CN=Person,CN=Schema,CN=Configuration,DC=contoso,DC=com
+dSCorePropagationData: 20190827201429.0Z
+dSCorePropagationData: 20190529140155.0Z
+dSCorePropagationData: 20190407190910.0Z
+dSCorePropagationData: 20190311163932.0Z
+dSCorePropagationData: 16010714223649.0Z
+lastLogonTimestamp: 130674899604502606
+
+# MYPC, ContosoUsers, contoso.com
+dn: CN=MYPC,OU=ContosoUsers,DC=contoso,DC=com
+objectClass: top
+objectClass: computer
+objectClass: organizationalPerson
+objectClass: user
+cn: MYPC
+givenName: MYPC
+distinguishedName: CN=MYPC,OU=ContosoUsers,DC=contoso,DC=com
+instanceType: 4
+whenCreated: 20120423175240.0Z
+whenChanged: 20190225044802.0Z
+displayName: MYPC
+uSNCreated: 793245
+memberOf: CN=vault_users,OU=Global,OU=Security,OU=Groups,DC=contoso,DC=com
+memberOf: CN=PWD Complexity,OU=Security,OU=Groups,DC=contoso,DC=com
+uSNChanged: 1076364863
+name: MYPC
+objectGUID:: 7OBfD10nQkSVYY8UHCV2aQ==
+userAccountControl: 66048
+codePage: 0
+countryCode: 0
+pwdLastSet: 129857191591306845
+primaryGroupID: 805306368
+objectSid:: AQUAAAAAAAUVAAAAa9ZiBBbA6jKDPStVYiIMAA==
+accountExpires: 9223372036854775807
+sAMAccountName: MYPC
+sAMAccountType: 805306368
+userPrincipalName: MYPC@contoso.com
+lockoutTime: 0
+objectCategory: CN=Person,CN=Schema,CN=Configuration,DC=contoso,DC=com
+dSCorePropagationData: 20190827201429.0Z
+dSCorePropagationData: 20190529140155.0Z
+dSCorePropagationData: 20190407190910.0Z
+dSCorePropagationData: 20190311163932.0Z
+dSCorePropagationData: 16010714223649.0Z
+lastLogonTimestamp: 130674899604502606
+

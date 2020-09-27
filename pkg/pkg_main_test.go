@@ -1,3 +1,3 @@
-package ldsview_test
+package ldsview
 
-const TESTFILE string = "../testdata/test_users.ldif"
+const TESTFILE = "../testdata/test_users.ldif"
