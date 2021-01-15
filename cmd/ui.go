@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	ldsview "github.com/kgoins/ldsview/pkg"
+	"github.com/spf13/cobra"
 	"os"
 	"sort"
-
-	ldsview "github.com/kgoins/ldsview/pkg"
 )
 
 func PrintAttribute(attr ldsview.EntityAttribute) {
@@ -14,7 +14,7 @@ func PrintAttribute(attr ldsview.EntityAttribute) {
 	}
 }
 
-func PrintEntity(entity ldsview.Entity) {
+func PrintEntity(entity ldsview.Entity, decodeTS bool) {
 	titleLine, err := BuildTitleLine(entity)
 	if err != nil {
 		os.Stderr.WriteString("Skipping output of malformed object\n")
@@ -24,6 +24,10 @@ func PrintEntity(entity ldsview.Entity) {
 
 	attrNames := entity.GetAllAttributeNames()
 
+	if decodeTS {
+		entity.DeocdeTimestamps()
+	}
+
 	sort.Strings(attrNames)
 
 	for _, name := range attrNames {
@@ -32,4 +36,35 @@ func PrintEntity(entity ldsview.Entity) {
 	}
 
 	fmt.Println()
+}
+
+// ChannelPrinter concurrently prints entity results and signals shared `done` channel
+// when finished
+func ChannelPrinter(entities chan ldsview.Entity, done chan bool, cmd *cobra.Command ) {
+
+	count, _ := cmd.Flags().GetBool("count")
+	tdc, _ := cmd.Flags().GetBool("tdc")
+	printLimit, intParseErr := cmd.Flags().GetInt("first")
+	if intParseErr != nil {
+		fmt.Printf("Unable to parse value: %s\n", intParseErr.Error())
+	}
+
+	entCount := 0
+
+	for entity := range entities {
+		entCount = entCount + 1
+
+		if !count {
+			PrintEntity(entity, tdc)
+		}
+
+		if entCount == printLimit {
+			break
+		}
+	}
+
+	if count {
+		fmt.Println("Entities: ", entCount)
+	}
+	done <- true
 }

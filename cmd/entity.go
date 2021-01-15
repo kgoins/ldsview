@@ -78,11 +78,7 @@ func execEntityCmd(ldifParser ldsview.LdifParser, keyAttr string, keyValue strin
 		return
 	}
 
-	if parseTdc {
-		entity.DeocdeTimestamps()
-	}
-
-	PrintEntity(entity)
+	PrintEntity(entity, parseTdc)
 }
 
 func init() {

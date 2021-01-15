@@ -2,17 +2,16 @@ package ldsview
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStructureBuilder_GetStructure(t *testing.T) {
 	parser := NewLdifParser(TESTFILE)
 
-	structure, err := GetStructure(&parser)
-	if err != nil {
-		t.Fatalf("failed to parse ldif for domain structure")
-	}
-
-	if len(structure) == 0 {
-		t.Fatalf("failed to parse ldif for domain structure")
-	}
+	t.Run("parses the ldif objects correctly", func(t *testing.T) {
+		structure, err := GetStructure(&parser)
+		assert.Nil(t, err)
+		assert.Greater(t, len(structure), 0)
+	})
 }

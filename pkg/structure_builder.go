@@ -19,25 +19,32 @@ func extractPathFromDN(dn string) string {
 	return ""
 }
 
-func GetStructure(source EntitySource) ([]string, error) {
+func GetStructure(source *LdifParser) ([]string, error) {
 	filterParts := []string{"dn", "distinguishedName"}
 	filter := BuildAttributeFilter(filterParts)
-
 	source.SetAttributeFilter(filter)
 
-	entities, err := source.BuildEntities()
+	entities, done, cont := make(chan Entity), make(chan bool), make(chan bool)
+
+	dnList := []string{}
+	go func(ents chan Entity, done chan bool, list *[]string) {
+		for entity := range ents {
+			dn, dnFound := entity.GetDN()
+			if dnFound {
+				dnList = append(dnList, dn.Value.GetSingleValue())
+			}
+		}
+		done <- true //signals to BuildEntities we're done processing
+		cont <- true //signals to self we're done processing
+
+	}(entities, done, &dnList)
+
+	err := source.BuildEntities(entities, done)
 	if err != nil {
 		return nil, err
 	}
 
-	dnList := []string{}
-	for _, entity := range entities {
-		dn, dnFound := entity.GetDN()
-		if dnFound {
-			dnList = append(dnList, dn.Value.GetSingleValue())
-		}
-	}
-
+	<-cont // wait for dnList to be populated
 	return buildStructureFromDNs(dnList), nil
 }
 

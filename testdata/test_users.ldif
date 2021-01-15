@@ -35,7 +35,47 @@ objectSid:: AQUAAAAAAAUVAAAAa9ZiBBbA6jKDPStVYiIMAA==
 accountExpires: 9223372036854775807
 sAMAccountName: MYUSR
 sAMAccountType: 805306368
+servicePrincipalName: HTTP/MYUSR
 userPrincipalName: MYUSR@contoso.com
+lockoutTime: 0
+objectCategory: CN=Person,CN=Schema,CN=Configuration,DC=contoso,DC=com
+dSCorePropagationData: 20190827201429.0Z
+dSCorePropagationData: 20190529140155.0Z
+dSCorePropagationData: 20190407190910.0Z
+dSCorePropagationData: 20190311163932.0Z
+dSCorePropagationData: 16010714223649.0Z
+lastLogonTimestamp: 130674899604502606
+
+# DISABLEDUSER, ContosoUsers, contoso.com
+dn: CN=DISABLEDUSER,OU=ContosoUsers,DC=contoso,DC=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: user
+cn: DISABLEDUSER
+givenName: DISABLEDUSER
+distinguishedName: CN=DISABLEDUSER,OU=ContosoUsers,DC=contoso,DC=com
+instanceType: 4
+whenCreated: 20120423175240.0Z
+whenChanged: 20190225044802.0Z
+displayName: DISABLEDUSER
+uSNCreated: 793245
+memberOf: CN=vault_users,OU=Global,OU=Security,OU=Groups,DC=contoso,DC=com
+memberOf: CN=PWD Complexity,OU=Security,OU=Groups,DC=contoso,DC=com
+uSNChanged: 1076364863
+name: DISABLEDUSER
+objectGUID:: 7OBfD10nQkSVYY8UHCV2aQ==
+userAccountControl: 66050
+codePage: 0
+countryCode: 0
+pwdLastSet: 129857191591306845
+primaryGroupID: 805306368
+objectSid:: AQUAAAAAAAUVAAAAa9ZiBBbA6jKDPStVYiIMAA==
+accountExpires: 9223372036854775807
+sAMAccountName: DISABLEDUSER
+sAMAccountType: 805306368
+servicePrincipalName: HTTP/DISABLEDUSER
+userPrincipalName: DISABLEDUSER@contoso.com
 lockoutTime: 0
 objectCategory: CN=Person,CN=Schema,CN=Configuration,DC=contoso,DC=com
 dSCorePropagationData: 20190827201429.0Z
@@ -73,6 +113,7 @@ objectSid:: AQUAAAAAAAUVAAAAa9ZiBBbA6jKDPStVYiIMAA==
 accountExpires: 9223372036854775807
 sAMAccountName: MYPC
 sAMAccountType: 805306368
+servicePrincipalName: HOST/MYPC
 userPrincipalName: MYPC@contoso.com
 lockoutTime: 0
 objectCategory: CN=Person,CN=Schema,CN=Configuration,DC=contoso,DC=com

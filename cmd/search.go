@@ -27,49 +27,27 @@ Example:
 	--> matches all computer objects with a hostname containing "net"`,
 	Run: func(cmd *cobra.Command, args []string) {
 		dumpFile, _ := cmd.Flags().GetString("file")
-
 		builder := ldsview.NewLdifParser(dumpFile)
-
 		filter, err := buildEntityFilter(cmd, args)
 		if err != nil {
 			fmt.Printf("Unable to parse filter\n")
 			return
 		}
-		builder.SetEntityFilter(filter)
 
+		builder.SetEntityFilter(filter)
 		attrFilter := buildAttrFilter(cmd)
 		builder.SetAttributeFilter(attrFilter)
 
-		count, _ := cmd.Flags().GetBool("count")
-		if count {
-			numEntities, _ := builder.CountEntities()
-			fmt.Printf("Entities: %d\n", numEntities)
-			return
-		}
+		entities := make(chan ldsview.Entity)
+		done := make(chan bool)
 
-		entities, err := builder.BuildEntities()
+		// Start the printing goroutine
+		go ChannelPrinter(entities, done, cmd)
+
+		err = builder.BuildEntities(entities, done)
 		if err != nil {
 			fmt.Printf("Unable to parse file: %s\n", err.Error())
 			return
-		}
-
-		printLimit, intParseErr := cmd.Flags().GetInt("first")
-		if intParseErr != nil {
-			fmt.Printf("Unable to parse value: %s\n", intParseErr.Error())
-		}
-
-		if printLimit != 0 {
-			entities = entities[:printLimit]
-		}
-
-		tdc, _ := cmd.Flags().GetBool("tdc")
-
-		for _, entity := range entities {
-			if tdc {
-				entity.DeocdeTimestamps()
-			}
-
-			PrintEntity(entity)
 		}
 	},
 }
