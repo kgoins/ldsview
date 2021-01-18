@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 
-	"github.com/spf13/cobra"
 	"github.com/kgoins/ldsview/internal"
+	"github.com/spf13/cobra"
 )
 
 // cmdbuilderCmd represents the uac command
@@ -13,20 +15,16 @@ var cmdbuilderCmd = &cobra.Command{
 	Short: "Builds the ldapsearch command needed to extract an ldif",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Print("Host: ")
-		var host string
-		fmt.Scanln(&host)
+		host := getString()
 
 		fmt.Print("Domain DN: ")
-		var domainDN string
-		fmt.Scanln(&domainDN)
+		domainDN := getString()
 
 		fmt.Print(`User (domain\username): `)
-		var user string
-		fmt.Scanln(&user)
+		user := getString()
 
 		fmt.Print("Password: ")
-		var password string
-		fmt.Scanln(&password)
+		password := getString()
 
 		options := internal.NewLdapsearchCmdOptions(
 			host,
@@ -42,4 +40,12 @@ var cmdbuilderCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(cmdbuilderCmd)
+}
+
+func getString() (output string) {
+	scanner := bufio.NewScanner(os.Stdin)
+	if scanner.Scan() {
+		output = scanner.Text()
+	}
+	return
 }

@@ -35,7 +35,7 @@ func BuildLdapsearchCmd(options LdapsearchCmdOptions) string {
 	builder.WriteString(fmt.Sprintf("	-h %s \\ \n", options.host))
 	builder.WriteString(fmt.Sprintf("	-b %s \\ \n", options.domainDN))
 	builder.WriteString(fmt.Sprintf("	-D '%s' \\ \n", options.user))
-	builder.WriteString(fmt.Sprintf("	-w %s \\ \n", options.password))
+	builder.WriteString(fmt.Sprintf("	-w '%s' \\ \n", options.password))
 	builder.WriteString(fmt.Sprintf("	\"%s\" \n", options.filter))
 
 	return builder.String()
