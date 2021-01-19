@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/kgoins/ldsview/internal"
 	"github.com/spf13/cobra"
@@ -47,5 +48,7 @@ func getString() (output string) {
 	if scanner.Scan() {
 		output = scanner.Text()
 	}
+
+	output = strings.TrimSpace(output)
 	return
 }
