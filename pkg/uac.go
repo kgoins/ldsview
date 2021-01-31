@@ -10,6 +10,29 @@ import (
 	"github.com/audibleblink/msldapuac"
 )
 
+type UACFilter struct {
+	searchProp int
+}
+
+func NewUACFilter(searchTerm int) UACFilter {
+	return UACFilter{searchProp: searchTerm}
+}
+
+func (filter UACFilter) Matches(entity Entity) (isMatch bool) {
+	uacAttr, found := entity.GetAttribute("userAccountControl")
+	if found {
+		uacString := uacAttr.Value.GetSingleValue()
+		uac, _ := strconv.ParseInt(uacString, 10, 32)
+		isMatch, err := msldapuac.IsSet(uac, filter.searchProp)
+		if err != nil {
+			fmt.Printf("Unable to verify UAC: %v\n", err.Error())
+			return false
+		}
+		return isMatch
+	}
+	return
+}
+
 // GetFlagsFromUAC wraps teh msldapuac dependency for easy re-definition
 func GetFlagsFromUAC(uac int64) ([]string, error) {
 	return msldapuac.ParseUAC(uac)

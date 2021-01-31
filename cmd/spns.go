@@ -2,9 +2,8 @@ package cmd
 
 import (
 	"fmt"
-
-	"github.com/spf13/cobra"
 	ldsview "github.com/kgoins/ldsview/pkg"
+	"github.com/spf13/cobra"
 )
 
 var spnsCmd = &cobra.Command{
@@ -14,14 +13,14 @@ var spnsCmd = &cobra.Command{
 		dumpFile, _ := cmd.Flags().GetString("file")
 		builder := ldsview.NewLdifParser(dumpFile)
 
-		filterParts := []string{"servicePrincipalName~:/"}
+		filterParts := []string{"servicePrincipalName:~/"}
 
 		getUsers, _ := cmd.Flags().GetBool("users")
 		if getUsers {
 			filterParts = []string{
-				"objectClass=:user",
-				"objectClass!=:computer",
-				"servicePrincipalName~:/",
+				"objectClass:=user",
+				"objectClass:!=computer",
+				"servicePrincipalName:~/",
 			}
 		}
 
@@ -32,20 +31,31 @@ var spnsCmd = &cobra.Command{
 		includeFilter := ldsview.BuildAttributeFilter(includeFilterparts)
 		builder.SetAttributeFilter(includeFilter)
 
-		entities, err := builder.BuildEntities()
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+		entities := make(chan ldsview.Entity)
+		done := make(chan bool)
 
-		for _, entity := range entities {
-			PrintEntity(entity)
+		// Start the printing goroutine
+		go ChannelPrinter(entities, done, cmd)
+
+		err := builder.BuildEntities(entities, done)
+		if err != nil {
+			fmt.Printf("Unable to parse file: %s\n", err.Error())
+			return
 		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(spnsCmd)
+
+	spnsCmd.PersistentFlags().BoolP("count", "c", false, "")
+	spnsCmd.PersistentFlags().Int("first", 0, "Print only the first <n> entries")
+
+	spnsCmd.PersistentFlags().Bool(
+		"tdc",
+		false,
+		"Decodes timestamps to a human readable format",
+	)
 
 	spnsCmd.PersistentFlags().BoolP(
 		"users",

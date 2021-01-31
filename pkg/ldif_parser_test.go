@@ -6,26 +6,27 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var parser = NewLdifParser(TESTFILE)
+func TestBuildEntities(t *testing.T) {
+	var parser = NewLdifParser(TESTFILE)
+	t.Run("parses the ldif objects correctly", func(t *testing.T) {
+		entities := make(chan Entity)
+		done := make(chan bool)
 
-func TestLdifParser(t *testing.T) {
+		filter, _ := BuildEntityFilter([]string{"cn:=*"})
+		parser.SetEntityFilter(filter)
 
-	t.Run("counts the ldif objects correctly", func(t *testing.T) {
-		want := 2
-		got, err := parser.CountEntities()
-		assert.Equal(t, want, got)
+		type count struct{ c int }
+		counter := &count{0}
+
+		go func(ents chan Entity, c *count) {
+			for _ = range ents {
+				c.c = c.c + 1
+			}
+			done <- true
+		}(entities, counter)
+
+		err := parser.BuildEntities(entities, done)
 		assert.Nil(t, err)
+		assert.Equal(t, 3, counter.c)
 	})
-
-	t.Run("counts the filtered ldif objects correctly", func(t *testing.T) {
-		entityFilterStr := []string{"objectClass:=computer"}
-		entityFilter, _ := BuildEntityFilter(entityFilterStr)
-		parser.SetEntityFilter(entityFilter)
-
-		want := 1
-		got, err := parser.CountEntities()
-		assert.Equal(t, want, got)
-		assert.Nil(t, err)
-	})
-
 }

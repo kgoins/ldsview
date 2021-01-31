@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/spf13/cobra"
 	"sort"
 
-	"github.com/spf13/cobra"
 	ldsview "github.com/kgoins/ldsview/pkg"
 )
 

@@ -23,17 +23,31 @@ var uacCmd = &cobra.Command{
 
 		shouldSearch, _ := cmd.Flags().GetInt("search")
 		if shouldSearch != 0 {
-			file, _ := cmd.Flags().GetString("file")
-			ldifFile := ldsview.NewLdifParser(file)
-			entities, err := ldifFile.BuildEntities()
+			dumpFile, _ := cmd.Flags().GetString("file")
+			builder := ldsview.NewLdifParser(dumpFile)
+			filter := []ldsview.IEntityFilter {
+				ldsview.NewUACFilter(shouldSearch),
+			}
+			builder.SetEntityFilter(filter)
+			attrFilter := buildAttrFilter(cmd)
+
+			usedI := cmd.Flags().Changed("include")
+			if usedI {
+				// must use AttrFilter if intent is to Match with
+				// EntityFilter
+				attrFilter.Add("useraccountcontrol")
+			}
+			builder.SetAttributeFilter(attrFilter)
+
+			entities := make(chan ldsview.Entity)
+			done := make(chan bool)
+
+			// Start the printing goroutine
+			go ChannelPrinter(entities, done, cmd)
+			err := builder.BuildEntities(entities, done)
 			if err != nil {
 				cmd.PrintErr("Error while parsing entities: ", err)
 				return
-			}
-
-			matches := ldsview.UACSearch(&entities, shouldSearch)
-			for _, match := range matches {
-				PrintEntity(match)
 			}
 			return
 		}
@@ -67,5 +81,21 @@ func init() {
 		"search",
 		0,
 		"UAC property by which to search",
+	)
+
+	uacCmd.PersistentFlags().BoolP("count", "c", false, "")
+	uacCmd.PersistentFlags().Int("first", 0, "Print only the first <n> entries")
+
+	uacCmd.PersistentFlags().Bool(
+		"tdc",
+		false,
+		"Decodes timestamps to a human readable format",
+	)
+
+	uacCmd.PersistentFlags().StringSliceP(
+		"include",
+		"i",
+		[]string{},
+		"Select which attributes are displayed from the returned entities",
 	)
 }

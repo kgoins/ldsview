@@ -174,66 +174,48 @@ func (parser LdifParser) BuildEntity(keyAttrName string, keyAttrVal string) (Ent
 }
 
 // BuildEntities constructs an ldap entity per entry in the input ldif file.
-func (parser LdifParser) BuildEntities() ([]Entity, error) {
-	entities := []Entity{}
-
+func (parser LdifParser) BuildEntities(entities chan Entity, done chan bool) error {
 	Logger.Info("Opening ldif file: " + parser.filename)
 	dumpFile, err := os.Open(parser.filename)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer dumpFile.Close()
 
 	Logger.Info("Finding first entity block")
 	entityScanner := parser.findFirstEntityBlock(dumpFile)
 	if entityScanner == nil {
-		return entities, errors.New("Unable to find first entity block")
+		return errors.New("Unable to find first entity block")
 	}
 
-	for entityScanner.Scan() {
-		titleLine := entityScanner.Text()
-		if !parser.isEntityTitle(titleLine) {
-			continue
-		}
-
-		Logger.Info("Parsing entity")
-		entity := parser.getEntityFromBlock(entityScanner)
-
-		dn, dnFound := entity.GetDN()
-		if !dnFound {
-			Logger.Error("Unable to parse DN for entity: " + titleLine)
-			continue
-		}
-
-		if parser.entityFilter != nil && len(parser.entityFilter) > 0 {
-			Logger.Info("Applying entity filter to: " + dn.Value.GetSingleValue())
-			if !MatchesFilter(entity, parser.entityFilter) {
+	go func(parser LdifParser, entities chan Entity, scanner *bufio.Scanner) {
+		defer close(entities)
+		for scanner.Scan() {
+			titleLine := scanner.Text()
+			if !parser.isEntityTitle(titleLine) {
 				continue
 			}
+
+			Logger.Info("Parsing entity")
+			entity := parser.getEntityFromBlock(scanner)
+
+			dn, dnFound := entity.GetDN()
+			if !dnFound {
+				Logger.Error("Unable to parse DN for entity: " + titleLine)
+				continue
+			}
+
+			if parser.entityFilter != nil && len(parser.entityFilter) > 0 {
+				Logger.Info("Applying entity filter to: " + dn.Value.GetSingleValue())
+				if !MatchesFilter(entity, parser.entityFilter) {
+					continue
+				}
+			}
+
+			Logger.Info("Appending matched entity: " + dn.Value.GetSingleValue())
+			entities <- entity
 		}
-
-		Logger.Info("Appending matched entity: " + dn.Value.GetSingleValue())
-		entities = append(entities, entity)
-	}
-
-	return entities, nil
-}
-
-// CountEntities returns the number of ldap entites in the input ldif file.
-func (parser LdifParser) CountEntities() (int, error) {
-	filterParts := []string{"dn", "distinguishedName"}
-	for _, filter := range parser.entityFilter {
-		entityFilter := filter.(EntityFilter)
-		filterParts = append(filterParts, entityFilter.AttributeName)
-	}
-
-	attrFilter := BuildAttributeFilter(filterParts)
-	parser.SetAttributeFilter(attrFilter)
-
-	entities, err := parser.BuildEntities()
-	if err != nil {
-		return 0, err
-	}
-
-	return len(entities), nil
+	}(parser, entities, entityScanner)
+	<-done
+	return err
 }
