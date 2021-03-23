@@ -36,13 +36,25 @@ func buildTitleObj(objParts []string) (string, error) {
 	return strings.Join(objComponents, ", "), nil
 }
 
+func splitDN(dnStr string) []string {
+	escSeq := "++"
+	dnClean := strings.ReplaceAll(dnStr, `\,`, escSeq)
+	dnParts := strings.Split(dnClean, ",")
+
+	for i := range dnParts {
+		dnParts[i] = strings.ReplaceAll(dnParts[i], escSeq, `\,`)
+	}
+
+	return dnParts
+}
+
 func BuildTitleLine(entity Entity) (string, error) {
 	dn, dnFound := entity.GetDN()
 	if !dnFound {
 		return "", errors.New("Unable to find DN in entity")
 	}
 
-	dnParts := strings.Split(dn.Value.GetSingleValue(), ",")
+	dnParts := splitDN(dn.Value.GetSingleValue())
 
 	domainParts := []string{}
 	objParts := []string{}
