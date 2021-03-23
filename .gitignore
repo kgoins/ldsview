@@ -3,3 +3,4 @@ testdata/
 ldsview
 .vscode/
 release/
+bin/
