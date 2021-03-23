@@ -1,11 +1,9 @@
-package cmd
+package ldsview
 
 import (
 	"errors"
 	"fmt"
 	"strings"
-
-	ldsview "github.com/kgoins/ldsview/pkg"
 )
 
 func buildTitleDomain(domainParts []string) (string, error) {
@@ -38,7 +36,7 @@ func buildTitleObj(objParts []string) (string, error) {
 	return strings.Join(objComponents, ", "), nil
 }
 
-func BuildTitleLine(entity ldsview.Entity) (string, error) {
+func BuildTitleLine(entity Entity) (string, error) {
 	dn, dnFound := entity.GetDN()
 	if !dnFound {
 		return "", errors.New("Unable to find DN in entity")

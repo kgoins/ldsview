@@ -16,7 +16,7 @@ func PrintAttribute(attr ldsview.EntityAttribute) {
 }
 
 func PrintEntity(entity ldsview.Entity, decodeTS bool) {
-	titleLine, err := BuildTitleLine(entity)
+	titleLine, err := ldsview.BuildTitleLine(entity)
 	if err != nil {
 		os.Stderr.WriteString("Skipping output of malformed object\n")
 		return
