@@ -1,0 +1,20 @@
+# Last\2CFirst(myuser), Accounts_User, Corp, corp.com
+dn: CN=Last\,First(myuser),OU=Accounts_User,DC=Corp,DC=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: user
+cn: Last,First(myuser)
+c: US
+description: Test user with escape char in DN
+telephoneNumber: +1 (800) 8675309
+givenName: First
+distinguishedName: CN=Last\,First(myuser),OU=Accounts_User,DC=Corp,DC=com
+instanceType: 4
+whenCreated: 20210303191154.0Z
+whenChanged: 20210303191154.0Z
+displayName: First Last
+sAMAccountName: myuser
+sAMAccountType: 805306368
+uSNChanged: 1987214053
+co: UNITED STATES
