@@ -19,7 +19,7 @@ func TestBuildEntities(t *testing.T) {
 		counter := &count{0}
 
 		go func(ents chan Entity, c *count) {
-			for _ = range ents {
+			for range ents {
 				c.c = c.c + 1
 			}
 			done <- true

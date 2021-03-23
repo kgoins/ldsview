@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	ldsview "github.com/kgoins/ldsview/pkg"
-	"github.com/spf13/cobra"
 	"os"
 	"sort"
+
+	ldsview "github.com/kgoins/ldsview/pkg"
+	"github.com/spf13/cobra"
 )
 
 func PrintAttribute(attr ldsview.EntityAttribute) {
@@ -18,6 +19,7 @@ func PrintEntity(entity ldsview.Entity, decodeTS bool) {
 	titleLine, err := BuildTitleLine(entity)
 	if err != nil {
 		os.Stderr.WriteString("Skipping output of malformed object\n")
+		return
 	}
 
 	fmt.Println(titleLine)
@@ -40,13 +42,16 @@ func PrintEntity(entity ldsview.Entity, decodeTS bool) {
 
 // ChannelPrinter concurrently prints entity results and signals shared `done` channel
 // when finished
-func ChannelPrinter(entities chan ldsview.Entity, done chan bool, cmd *cobra.Command ) {
+func ChannelPrinter(entities chan ldsview.Entity, done chan bool, cmd *cobra.Command) {
 
 	count, _ := cmd.Flags().GetBool("count")
 	tdc, _ := cmd.Flags().GetBool("tdc")
+
 	printLimit, intParseErr := cmd.Flags().GetInt("first")
 	if intParseErr != nil {
 		fmt.Printf("Unable to parse value: %s\n", intParseErr.Error())
+		done <- true
+		return
 	}
 
 	entCount := 0
