@@ -11,6 +11,8 @@ import (
 	"github.com/kgoins/ldsview/internal"
 )
 
+const LDAPMaxLineSize int = 1024 * 1024 * 10
+
 // LdifParser implements EntityBuilder and constructs LDAP Entities
 // from an ldif file.
 type LdifParser struct {
@@ -32,7 +34,7 @@ func NewLdifParser(filename string) LdifParser {
 		entityFilter:      []IEntityFilter{},
 		attributeFilter:   internal.NewHashSetStr(),
 		titleLineRegex:    regex,
-		scannerBufferSize: 1024 * 1024 * 10,
+		scannerBufferSize: LDAPMaxLineSize,
 	}
 }
 

@@ -16,6 +16,9 @@ func NewPositionedScanner(inputStream io.Reader) *PositionedScanner {
 		scanner: bufio.NewScanner(inputStream),
 	}
 
+	lineBuf := make([]byte, LDAPMaxLineSize)
+	positionedScanner.Buffer(lineBuf, LDAPMaxLineSize)
+
 	scanLines := func(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		advance, token, err = bufio.ScanLines(data, atEOF)
 		positionedScanner.pos += int64(advance)
