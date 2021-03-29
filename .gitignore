@@ -3,3 +3,4 @@ ldsview
 .vscode/
 release/
 bin/
+dist/
