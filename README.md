@@ -32,3 +32,28 @@ Detailed usage information is available via the `--help` flag or the `help` comm
     * This command will return all entities with an `adminCount` of 1 that are not `krbtgt`
     * `-i` can be used to limit which attributes are returned from matching entities
     * `--tdc` will translate directory timestamps into a human readable format
+
+
+### Tools Directory
+
+Additional tools and utilities for managing LDIFs:
+
+***Makefile***: Place the Makefile in the same directory as your exported LDIF and run make.
+
+```sh
+>> make -j9 LDIF=./my.domain.ldif
+```
+This will split and create the following default LDIFs:
+
+* users.ldif
+* computers.ldif
+* groups.ldif
+* domain_admin.ldif
+* poss_svc_accnts.ldif
+* pass_not_reqd.ldif
+* pass_cant_change.ldif
+* users_dont_expire.ldif
+* trusted_4_delegation.ldif
+* preauth_not_reqd.ldif
+* password_expired.ldif
+* trust2auth4delegation.ldif
