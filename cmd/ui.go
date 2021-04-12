@@ -44,7 +44,6 @@ func PrintEntity(entity ldsview.Entity, decodeTS bool) {
 // when finished
 func ChannelPrinter(entities chan ldsview.Entity, done chan bool, cmd *cobra.Command) {
 
-	count, _ := cmd.Flags().GetBool("count")
 	tdc, _ := cmd.Flags().GetBool("tdc")
 
 	printLimit, intParseErr := cmd.Flags().GetInt("first")
@@ -59,17 +58,12 @@ func ChannelPrinter(entities chan ldsview.Entity, done chan bool, cmd *cobra.Com
 	for entity := range entities {
 		entCount = entCount + 1
 
-		if !count {
-			PrintEntity(entity, tdc)
-		}
+		PrintEntity(entity, tdc)
 
 		if entCount == printLimit {
 			break
 		}
 	}
 
-	if count {
-		fmt.Println("Entities: ", entCount)
-	}
 	done <- true
 }
