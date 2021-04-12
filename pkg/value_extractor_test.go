@@ -7,11 +7,12 @@ import (
 )
 
 func TestValueExtractor_GetValues(t *testing.T) {
-	parser := NewLdifParser(TESTFILE)
+	a := assert.New(t)
 
-	t.Run("parses the ldif objects correctly", func(t *testing.T) {
-		structure, err := GetValues(&parser, "cn")
-		assert.Nil(t, err)
-		assert.Greater(t, len(structure), 0)
-	})
+	parser := NewLdifParser(TESTFILE)
+	a.NotNil(parser)
+
+	vals, err := GetValues(&parser, "cn")
+	a.NoError(err)
+	a.Equal(NUMENTITIES, len(vals))
 }
