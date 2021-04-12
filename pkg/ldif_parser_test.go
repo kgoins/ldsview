@@ -28,7 +28,7 @@ func TestBuildEntities(t *testing.T) {
 
 		err := parser.BuildEntities(entities, done)
 		assert.Nil(t, err)
-		assert.Equal(t, 3, counter.c)
+		assert.Equal(t, NUMENTITIES, counter.c)
 	})
 }
 
