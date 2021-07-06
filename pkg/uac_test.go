@@ -1,4 +1,4 @@
-package ldsview
+package ldsview_test
 
 import (
 	"bytes"

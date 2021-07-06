@@ -3,7 +3,10 @@ package ldsview
 import (
 	"strings"
 
-	"github.com/kgoins/ldsview/internal"
+	hashset "github.com/kgoins/hashset/pkg"
+	"github.com/kgoins/ldapentity/entity"
+	"github.com/kgoins/ldifparser/entitybuilder"
+	"github.com/kgoins/ldsview/pkg/searcher"
 )
 
 func extractPathFromDN(dn string) string {
@@ -19,39 +22,28 @@ func extractPathFromDN(dn string) string {
 	return ""
 }
 
-func GetStructure(source *LdifParser) ([]string, error) {
+func GetStructure(searcher searcher.LdapSearcher) ([]string, error) {
 	filterParts := []string{"dn", "distinguishedName"}
-	filter := BuildAttributeFilter(filterParts)
-	source.SetAttributeFilter(filter)
+	filter := entitybuilder.NewAttributeFilter(filterParts...)
 
-	entities, done, cont := make(chan Entity), make(chan bool), make(chan bool)
+	done := make(chan bool)
+	defer close(done)
 
-	dnList := []string{}
-	go func(ents chan Entity, done chan bool, list *[]string) {
-		for entity := range ents {
-			dn, dnFound := entity.GetDN()
-			if dnFound {
-				dnList = append(dnList, dn.Value.GetSingleValue())
-			}
-		}
-		done <- true //signals to BuildEntities we're done processing
-		cont <- true //signals to self we're done processing
+	entities := searcher.ReadAllEntities(done, filter)
+	structure := buildStructureFromDNs(entities)
 
-	}(entities, done, &dnList)
-
-	err := source.BuildEntities(entities, done)
-	if err != nil {
-		return nil, err
-	}
-
-	<-cont // wait for dnList to be populated
-	return buildStructureFromDNs(dnList), nil
+	return structure, nil
 }
 
-func buildStructureFromDNs(dnList []string) []string {
-	structure := internal.NewHashSetStr()
+func buildStructureFromDNs(entities <-chan entity.Entity) []string {
+	structure := hashset.NewStrHashset()
 
-	for _, dn := range dnList {
+	for e := range entities {
+		dn, found := e.GetDN()
+		if !found {
+			continue
+		}
+
 		ouPath := extractPathFromDN(dn)
 		structure.Add(ouPath)
 	}

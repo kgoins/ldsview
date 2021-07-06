@@ -1,18 +1,25 @@
-package ldsview
+package ldsview_test
 
 import (
+	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	ldsview "github.com/kgoins/ldsview/pkg"
+	"github.com/kgoins/ldsview/pkg/searcher"
+	"github.com/stretchr/testify/require"
 )
 
 func TestLdifParser_CountEntities(t *testing.T) {
-	a := assert.New(t)
+	r := require.New(t)
 
-	parser := NewLdifParser(TESTFILE)
-	a.NotNil(parser)
+	testFile, err := os.Open(TESTFILE)
+	r.NoError(err)
+	defer testFile.Close()
 
-	count, err := parser.CountEntities()
-	a.NoError(err)
-	a.Equal(count, NUMENTITIES)
+	searcher := searcher.NewLdifSearcher(testFile)
+	r.NotNil(searcher)
+
+	count, err := ldsview.CountEntities(searcher)
+	r.NoError(err)
+	r.Equal(count, NUMENTITIES)
 }

@@ -1,17 +1,25 @@
-package ldsview
+package ldsview_test
 
 import (
+	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	ldsview "github.com/kgoins/ldsview/pkg"
+	"github.com/kgoins/ldsview/pkg/searcher"
+	"github.com/stretchr/testify/require"
 )
 
 func TestStructureBuilder_GetStructure(t *testing.T) {
-	parser := NewLdifParser(TESTFILE)
+	r := require.New(t)
 
-	t.Run("parses the ldif objects correctly", func(t *testing.T) {
-		structure, err := GetStructure(&parser)
-		assert.Nil(t, err)
-		assert.Greater(t, len(structure), 0)
-	})
+	testFile, err := os.Open(TESTFILE)
+	r.NoError(err)
+	defer testFile.Close()
+
+	searcher := searcher.NewLdifSearcher(testFile)
+	r.NotNil(searcher)
+
+	structure, err := ldsview.GetStructure(searcher)
+	r.NoError(err)
+	r.NotEmpty(structure)
 }

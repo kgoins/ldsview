@@ -8,6 +8,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/audibleblink/msldapuac"
+	"github.com/kgoins/ldapentity/entity"
 )
 
 type UACFilter struct {
@@ -18,7 +19,7 @@ func NewUACFilter(searchTerm int) UACFilter {
 	return UACFilter{searchProp: searchTerm}
 }
 
-func (filter UACFilter) Matches(entity Entity) (isMatch bool) {
+func (filter UACFilter) Matches(entity entity.Entity) (isMatch bool) {
 	uacAttr, found := entity.GetAttribute("userAccountControl")
 	if found {
 		uacString := uacAttr.Value.GetSingleValue()
@@ -33,20 +34,19 @@ func (filter UACFilter) Matches(entity Entity) (isMatch bool) {
 	return
 }
 
-// GetFlagsFromUAC wraps teh msldapuac dependency for easy re-definition
+// GetFlagsFromUAC wraps the msldapuac dependency for easy re-definition
 func GetFlagsFromUAC(uac int64) ([]string, error) {
 	return msldapuac.ParseUAC(uac)
 }
 
 // UACSearch will seek for entities who have the given UAC property set
-func UACSearch(entities *[]Entity, uacProp int) (matches []Entity) {
+func UACSearch(entities *[]entity.Entity, uacProp int) (matches []entity.Entity) {
 	for _, entity := range *entities {
-		uac, found := entity.GetAttribute("userAccountControl")
+		uacStr, found := entity.GetSingleValuedAttribute("userAccountControl")
 		if !found {
 			continue
 		}
 
-		uacStr := uac.Value.GetSingleValue()
 		i64, _ := strconv.ParseInt(uacStr, 10, 32)
 		isMatch, err := msldapuac.IsSet(i64, uacProp)
 		if err != nil {
@@ -59,7 +59,7 @@ func UACSearch(entities *[]Entity, uacProp int) (matches []Entity) {
 	return
 }
 
-//UACPrint prints the available UAC options that are available for searching
+// UACPrint prints the available UAC options that are available for searching
 func UACPrint(dest io.Writer) {
 	w := new(tabwriter.Writer)
 	w.Init(dest, 8, 8, 0, '\t', 0)
