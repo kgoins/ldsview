@@ -127,6 +127,8 @@ github.com/kgoins/ldapentity v0.1.0 h1:runywoOwbja0YBfD0MnSGbVw37A9Wnae/zotW6eYU
 github.com/kgoins/ldapentity v0.1.0/go.mod h1:FKVT2nDdxT1vto8HbLIEwcN2YSjQ76HhquRq2gnhbY0=
 github.com/kgoins/ldifparser v0.2.0 h1:70+aq32cdGKadApBvKDICszGAUeI5xBCm4HqObaYlPI=
 github.com/kgoins/ldifparser v0.2.0/go.mod h1:p6ma33UPjYTuW5/un9Kra1NJyiB3W0fnPzKZW4zoMyo=
+github.com/kgoins/ldifparser v0.2.1 h1:5/tYP5Bi1TwwtFWNo6HTeRO2LD3oXKCrxOptNqC89mA=
+github.com/kgoins/ldifparser v0.2.1/go.mod h1:npsWHMuarMAvCp5clDwaeGx/09n5iugGYI+wCOJCefQ=
 github.com/kgoins/poscanner v1.0.0 h1:ZDVJUE216lEymBlrH/uxOITWjfudM+j9pnRhETe2VJc=
 github.com/kgoins/poscanner v1.0.0/go.mod h1:PJutzjm9EpQifKLtzZGhphbMlUMe8vByzh04jRdvSIg=
 github.com/kisielk/errcheck v1.1.0/go.mod h1:EZBBE59ingxPouuu3KfxchcWSUPOHkagtvWXihfKN4Q=
