@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"os"
 
+	"github.com/kgoins/ldsview/internal"
 	ldsview "github.com/kgoins/ldsview/pkg"
 	"github.com/kgoins/ldsview/pkg/searcher"
 	"github.com/spf13/cobra"
@@ -15,15 +15,12 @@ var countCmd = &cobra.Command{
 	Use:   "count",
 	Short: "Counts the number of entities in an ldif file",
 	Run: func(cmd *cobra.Command, args []string) {
-		inputFilePath, _ := cmd.Flags().GetString("file")
-
-		inputFile, err := os.Open(inputFilePath)
+		svcs, err := internal.BulidContainerFromFlags(cmd)
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer inputFile.Close()
 
-		searcher := searcher.NewLdifSearcher(inputFile)
+		searcher := svcs.Get("ldapsearcher").(searcher.LdapSearcher)
 		count, err := ldsview.CountEntities(searcher)
 		if err != nil {
 			log.Fatal(err)

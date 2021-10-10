@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/spf13/cobra"
 	"github.com/kgoins/ldsview/internal"
-	ldsview "github.com/kgoins/ldsview/pkg"
+	"github.com/kgoins/snakecharmer/snakecharmer"
+	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -18,18 +18,10 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "ldsview",
 	Short: "CLI application to parse offline dumps from ldapsearch queries",
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		ldsview.EnableLogging()
-
-		verbose, _ := cmd.Flags().GetBool("verbose")
-		if verbose {
-			ldsview.Logger.SetLogLevelInfo()
-		}
-
-		debug, _ := cmd.Flags().GetBool("debug")
-		if debug {
-			ldsview.Logger.SetLogLevelDebug()
-		}
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		snakeCharmer := snakecharmer.NewSnakeCharmer(".ldsview", "LDSVIEW")
+		confPath, _ := cmd.Flags().GetString("config")
+		return snakeCharmer.InitConfig(cmd, confPath)
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		if version, _ := cmd.Flags().GetBool("version"); version == true {
