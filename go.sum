@@ -122,11 +122,8 @@ github.com/kgoins/entityfilter v1.0.0 h1:jsLe5pU0fyDa+Iu8r5AxAxCfsj2Wh8x+U7M20qL
 github.com/kgoins/entityfilter v1.0.0/go.mod h1:H/Eyq9M1OFuSOKvuP7X8IzB+4qRZQYpe9wJTS1mWsz8=
 github.com/kgoins/hashset v0.1.0 h1:fTE0PSDGSnpidJd7tT7tw/vdCCtOZ0OpTO6x53w2upg=
 github.com/kgoins/hashset v0.1.0/go.mod h1:La39wQwoV2fuwcVhBbROEdyVY+/3lhlVlCb08jd+4Pc=
-github.com/kgoins/ldapentity v0.0.0-20210616165926-96e2103eb03d/go.mod h1:FKVT2nDdxT1vto8HbLIEwcN2YSjQ76HhquRq2gnhbY0=
 github.com/kgoins/ldapentity v0.1.0 h1:runywoOwbja0YBfD0MnSGbVw37A9Wnae/zotW6eYUSE=
 github.com/kgoins/ldapentity v0.1.0/go.mod h1:FKVT2nDdxT1vto8HbLIEwcN2YSjQ76HhquRq2gnhbY0=
-github.com/kgoins/ldifparser v0.2.0 h1:70+aq32cdGKadApBvKDICszGAUeI5xBCm4HqObaYlPI=
-github.com/kgoins/ldifparser v0.2.0/go.mod h1:p6ma33UPjYTuW5/un9Kra1NJyiB3W0fnPzKZW4zoMyo=
 github.com/kgoins/ldifparser v0.2.1 h1:5/tYP5Bi1TwwtFWNo6HTeRO2LD3oXKCrxOptNqC89mA=
 github.com/kgoins/ldifparser v0.2.1/go.mod h1:npsWHMuarMAvCp5clDwaeGx/09n5iugGYI+wCOJCefQ=
 github.com/kgoins/poscanner v1.0.0 h1:ZDVJUE216lEymBlrH/uxOITWjfudM+j9pnRhETe2VJc=
@@ -191,6 +188,8 @@ github.com/rogpeppe/fastuuid v0.0.0-20150106093220-6724a57986af/go.mod h1:XWv6So
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f/go.mod h1:sm1tb6uqfes/u+d4ooFouqFdy9/2g9QGwK3SQygK0Ts=
+github.com/sarulabs/di v2.0.0+incompatible h1:gsiKbengnJvdA+XkdV7SqlH3kFQMaIqKD+rgefIRwS0=
+github.com/sarulabs/di v2.0.0+incompatible/go.mod h1:w5YAFs2sBoVzwDsWaBqJ2NzOmUHo/EZKdB3DOJ+BmHI=
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=
 github.com/shurcooL/sanitized_anchor_name v1.0.0/go.mod h1:1NzhyTcUVG4SuEtjjoZeVRXNmyL/1OwPU0+IJeTBvfc=
 github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=
