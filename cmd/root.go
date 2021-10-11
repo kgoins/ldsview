@@ -14,7 +14,7 @@ var rootCmd = &cobra.Command{
 	Use:   "ldsview",
 	Short: "CLI application to parse offline dumps from ldapsearch queries",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		snakeCharmer := snakecharmer.NewSnakeCharmer(".ldsview", "LDSVIEW")
+		snakeCharmer := snakecharmer.NewSnakeCharmer("LDSVIEW", ".ldsview")
 		confPath, _ := cmd.Flags().GetString("config")
 		return snakeCharmer.InitConfig(cmd, confPath)
 	},
