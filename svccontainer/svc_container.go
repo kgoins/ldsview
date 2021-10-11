@@ -22,7 +22,7 @@ func BuildContainer(confReader *viper.Viper) (di.Container, error) {
 			Name:  "ldiffile",
 			Scope: di.App,
 			Build: func(ctn di.Container) (interface{}, error) {
-				filePath := viper.GetString("file")
+				filePath := confReader.GetString("file")
 				return os.Open(filePath)
 			},
 			Close: func(obj interface{}) error {
