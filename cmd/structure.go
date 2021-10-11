@@ -2,10 +2,14 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
+	"log"
 	"sort"
 
+	"github.com/spf13/cobra"
+
+	"github.com/kgoins/ldsview/internal"
 	ldsview "github.com/kgoins/ldsview/pkg"
+	"github.com/kgoins/ldsview/pkg/searcher"
 )
 
 // structureCmd represents the structure command
@@ -13,10 +17,14 @@ var structureCmd = &cobra.Command{
 	Use:   "structure",
 	Short: "Extracts the OU path structure of the ldif file",
 	Run: func(cmd *cobra.Command, args []string) {
-		dumpFile, _ := cmd.Flags().GetString("file")
-		source := ldsview.NewLdifParser(dumpFile)
+		svcs, err := internal.BulidContainerFromFlags(cmd)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-		structure, err := ldsview.GetStructure(&source)
+		searcher := svcs.Get("ldapsearcher").(searcher.LdapSearcher)
+
+		structure, err := ldsview.GetStructure(searcher)
 		if err != nil {
 			fmt.Printf("%s\n", err.Error())
 			return

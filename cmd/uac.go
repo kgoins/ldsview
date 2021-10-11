@@ -1,9 +1,16 @@
 package cmd
 
 import (
+	"fmt"
+	"io"
+	"log"
 	"os"
+	"sort"
+	"strconv"
+	"text/tabwriter"
 
-	ldsview "github.com/kgoins/ldsview/pkg"
+	"github.com/audibleblink/msldapuac"
+	uac "github.com/audibleblink/msldapuac"
 	"github.com/spf13/cobra"
 )
 
@@ -17,55 +24,52 @@ var uacCmd = &cobra.Command{
 
 		shouldList, _ := cmd.Flags().GetBool("list")
 		if shouldList {
-			ldsview.UACPrint(os.Stdout)
+			printUACVals(cmd.OutOrStdout())
 			return
 		}
 
-		shouldSearch, _ := cmd.Flags().GetInt("search")
-		if shouldSearch != 0 {
-			dumpFile, _ := cmd.Flags().GetString("file")
-			builder := ldsview.NewLdifParser(dumpFile)
-			filter := []ldsview.IEntityFilter {
-				ldsview.NewUACFilter(shouldSearch),
-			}
-			builder.SetEntityFilter(filter)
-			attrFilter := buildAttrFilter(cmd)
-
-			usedI := cmd.Flags().Changed("include")
-			if usedI {
-				// must use AttrFilter if intent is to Match with
-				// EntityFilter
-				attrFilter.Add("useraccountcontrol")
-			}
-			builder.SetAttributeFilter(attrFilter)
-
-			entities := make(chan ldsview.Entity)
-			done := make(chan bool)
-
-			// Start the printing goroutine
-			go ChannelPrinter(entities, done, cmd)
-			err := builder.BuildEntities(entities, done)
-			if err != nil {
-				cmd.PrintErr("Error while parsing entities: ", err)
-				return
-			}
+		if len(args) < 1 {
+			cmd.Help()
 			return
 		}
 
-		if len(args) > 0 {
-			uacFlags, err := ldsview.UACParse(args[0])
-			if err != nil {
-				cmd.PrintErr(err)
-				cmd.Help()
-			}
-
-			for _, flag := range uacFlags {
-				cmd.Println(flag)
-			}
-			return
+		uacInt, err := strconv.ParseInt(args[0], 0, 64)
+		if err != nil {
+			log.Fatal(err)
 		}
-		cmd.Help()
+
+		uacFlags, err := uac.ParseUAC(uacInt)
+		if err != nil {
+			cmd.PrintErr(err)
+			cmd.Help()
+		}
+
+		for _, flag := range uacFlags {
+			cmd.Println(flag)
+		}
+
+		return
 	},
+}
+
+// prints all available UAC values
+func printUACVals(dest io.Writer) {
+	w := new(tabwriter.Writer)
+	w.Init(dest, 8, 8, 0, '\t', 0)
+	defer w.Flush()
+
+	template := "%s\t%d\n"
+	var sorted []string
+	for k, v := range msldapuac.PropertyMap {
+		sorted = append(sorted, fmt.Sprintf(template, v, k))
+	}
+
+	sort.Strings(sorted)
+	fmt.Fprintf(w, "Property\tValue\n")
+	fmt.Fprintf(w, "---\t---\n")
+	for _, line := range sorted {
+		fmt.Fprintf(w, line)
+	}
 }
 
 func init() {
@@ -75,27 +79,5 @@ func init() {
 		"list",
 		false,
 		"Lists the available UAC properties by which to search",
-	)
-
-	uacCmd.PersistentFlags().Int(
-		"search",
-		0,
-		"UAC property by which to search",
-	)
-
-	uacCmd.PersistentFlags().BoolP("count", "c", false, "")
-	uacCmd.PersistentFlags().Int("first", 0, "Print only the first <n> entries")
-
-	uacCmd.PersistentFlags().Bool(
-		"tdc",
-		false,
-		"Decodes timestamps to a human readable format",
-	)
-
-	uacCmd.PersistentFlags().StringSliceP(
-		"include",
-		"i",
-		[]string{},
-		"Select which attributes are displayed from the returned entities",
 	)
 }
