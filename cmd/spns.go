@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -20,7 +19,6 @@ var spnsCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-
 		searcher := svcs.Get("ldapsearcher").(searcher.LdapSearcher)
 
 		filterStr := "servicePrincipalName:~/"
@@ -48,10 +46,6 @@ var spnsCmd = &cobra.Command{
 		defer close(done)
 
 		entities := searcher.SearchEntities(done, includeFilter, entityFilter)
-		if err != nil {
-			fmt.Printf("Unable to parse file: %s\n", err.Error())
-			return
-		}
 
 		printerDone, err := ChannelPrinter(entities, done, cmd)
 		if err != nil {
