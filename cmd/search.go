@@ -48,7 +48,7 @@ Example:
 		attrFilterParts, _ := cmd.Flags().GetStringSlice("include")
 		attrFilter := entitybuilder.NewAttributeFilter(attrFilterParts...)
 
-		done := make(chan bool) // ownership passes to SearchEntities
+		done := make(chan bool)
 		defer close(done)
 
 		entities := searcher.SearchEntities(done, attrFilter, entityFilter)

@@ -45,6 +45,7 @@ func (s LdifSearcher) SearchEntities(
 	entityStream := s.reader.ReadEntitiesChanneled(done)
 
 	go func() {
+		defer close(resultStream)
 		for entity := range entityStream {
 			matches, err := s.matcher.Matches(entity, ef)
 			if err != nil {

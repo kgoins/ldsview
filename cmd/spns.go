@@ -42,7 +42,7 @@ var spnsCmd = &cobra.Command{
 		includeFilterparts, _ := cmd.Flags().GetStringSlice("include")
 		includeFilter := entitybuilder.NewAttributeFilter(includeFilterparts...)
 
-		done := make(chan bool) // ownership passes to SearchEntities
+		done := make(chan bool)
 		defer close(done)
 
 		entities := searcher.SearchEntities(done, includeFilter, entityFilter)
