@@ -38,7 +38,7 @@ func PrintEntity(entity entity.Entity, decodeTS bool) {
 	fmt.Println()
 }
 
-func ChannelPrinter(entities <-chan entity.Entity, interrupt <-chan bool, cmd *cobra.Command) (printDone chan bool, err error) {
+func ChannelPrinter(entities <-chan entity.Entity, cmd *cobra.Command) (err error) {
 	tdc, _ := cmd.Flags().GetBool("tdc")
 
 	printLimit, intParseErr := cmd.Flags().GetInt("first")
@@ -47,28 +47,16 @@ func ChannelPrinter(entities <-chan entity.Entity, interrupt <-chan bool, cmd *c
 		return
 	}
 
-	printDone = make(chan bool)
+	entCount := 0
+	for entity := range entities {
+		entCount = entCount + 1
 
-	go func() {
-		defer close(printDone)
+		PrintEntity(entity, tdc)
 
-		entCount := 0
-		for entity := range entities {
-			select {
-			case <-interrupt:
-				return
-			default:
-			}
-
-			entCount = entCount + 1
-
-			PrintEntity(entity, tdc)
-
-			if entCount == printLimit {
-				break
-			}
+		if entCount == printLimit {
+			break
 		}
-	}()
+	}
 
-	return printDone, nil
+	return
 }

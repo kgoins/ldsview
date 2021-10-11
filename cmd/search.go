@@ -53,13 +53,10 @@ Example:
 
 		entities := searcher.SearchEntities(done, attrFilter, entityFilter)
 
-		printerDone, err := ChannelPrinter(entities, done, cmd)
+		err = ChannelPrinter(entities, cmd)
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		// wait for printer to finish
-		<-printerDone
 	},
 }
 
