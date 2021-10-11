@@ -28,10 +28,6 @@ func PrintEntity(entity entity.Entity, decodeTS bool) {
 
 	attrNames := entity.GetAllAttributeNames()
 
-	if decodeTS {
-		entity.DeocdeTimestamps()
-	}
-
 	sort.Strings(attrNames)
 
 	for _, name := range attrNames {
@@ -42,7 +38,7 @@ func PrintEntity(entity entity.Entity, decodeTS bool) {
 	fmt.Println()
 }
 
-func ChannelPrinter(entities <-chan entity.Entity, done <-chan bool, cmd *cobra.Command) (printDone chan bool, err error) {
+func ChannelPrinter(entities <-chan entity.Entity, interrupt <-chan bool, cmd *cobra.Command) (printDone chan bool, err error) {
 	tdc, _ := cmd.Flags().GetBool("tdc")
 
 	printLimit, intParseErr := cmd.Flags().GetInt("first")
@@ -58,6 +54,12 @@ func ChannelPrinter(entities <-chan entity.Entity, done <-chan bool, cmd *cobra.
 
 		entCount := 0
 		for entity := range entities {
+			select {
+			case <-interrupt:
+				return
+			default:
+			}
+
 			entCount = entCount + 1
 
 			PrintEntity(entity, tdc)
@@ -66,8 +68,6 @@ func ChannelPrinter(entities <-chan entity.Entity, done <-chan bool, cmd *cobra.
 				break
 			}
 		}
-
-		printDone <- true
 	}()
 
 	return printDone, nil
