@@ -2,7 +2,13 @@ package cmd
 
 import (
 	"fmt"
-	ldsview "github.com/kgoins/ldsview/pkg"
+	"log"
+	"strings"
+
+	filter "github.com/kgoins/entityfilter/entityfilter"
+	"github.com/kgoins/ldifparser/entitybuilder"
+	"github.com/kgoins/ldsview/internal"
+	"github.com/kgoins/ldsview/pkg/searcher"
 	"github.com/spf13/cobra"
 )
 
@@ -10,38 +16,50 @@ var spnsCmd = &cobra.Command{
 	Use:   "spns",
 	Short: "Display entities with service principal names set",
 	Run: func(cmd *cobra.Command, args []string) {
-		dumpFile, _ := cmd.Flags().GetString("file")
-		builder := ldsview.NewLdifParser(dumpFile)
+		svcs, err := internal.BulidContainerFromFlags(cmd)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-		filterParts := []string{"servicePrincipalName:~/"}
+		searcher := svcs.Get("ldapsearcher").(searcher.LdapSearcher)
+
+		filterStr := "servicePrincipalName:~/"
 
 		getUsers, _ := cmd.Flags().GetBool("users")
 		if getUsers {
-			filterParts = []string{
+			filterParts := []string{
 				"objectClass:=user",
 				"objectClass:!=computer",
 				"servicePrincipalName:~/",
 			}
+
+			filterStr = strings.Join(filterParts, ",")
 		}
 
-		filter, _ := ldsview.BuildEntityFilter(filterParts)
-		builder.SetEntityFilter(filter)
+		entityFilter, err := filter.ParseFilterStr(filterStr)
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		includeFilterparts, _ := cmd.Flags().GetStringSlice("include")
-		includeFilter := ldsview.BuildAttributeFilter(includeFilterparts)
-		builder.SetAttributeFilter(includeFilter)
+		includeFilter := entitybuilder.NewAttributeFilter(includeFilterparts...)
 
-		entities := make(chan ldsview.Entity)
-		done := make(chan bool)
+		done := make(chan bool) // ownership passes to SearchEntities
+		defer close(done)
 
-		// Start the printing goroutine
-		go ChannelPrinter(entities, done, cmd)
-
-		err := builder.BuildEntities(entities, done)
+		entities := searcher.SearchEntities(done, includeFilter, entityFilter)
 		if err != nil {
 			fmt.Printf("Unable to parse file: %s\n", err.Error())
 			return
 		}
+
+		printerDone, err := ChannelPrinter(entities, done, cmd)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// wait for printer to finish
+		<-printerDone
 	},
 }
 
