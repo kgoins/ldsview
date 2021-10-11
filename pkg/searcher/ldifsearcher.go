@@ -27,6 +27,8 @@ func (s LdifSearcher) ReadEntity(keyAttrName, keyAttrVal string) (e entity.Entit
 	return s.reader.ReadEntity(keyAttrName, keyAttrVal)
 }
 
+// The output channel is closed by the underlying reader when all entities
+// have been read.
 func (s LdifSearcher) ReadAllEntities(done <-chan bool, af entitybuilder.AttributeFilter) <-chan entity.Entity {
 	s.reader.SetAttributeFilter(af)
 	return s.reader.ReadEntitiesChanneled(done)
