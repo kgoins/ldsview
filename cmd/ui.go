@@ -43,7 +43,7 @@ func ChannelPrinter(entities <-chan entity.Entity, interrupt <-chan bool, cmd *c
 
 	printLimit, intParseErr := cmd.Flags().GetInt("first")
 	if intParseErr != nil {
-		err = fmt.Errorf("unable to parse value: %s\n", intParseErr.Error())
+		err = fmt.Errorf("unable to parse value: %s", intParseErr.Error())
 		return
 	}
 

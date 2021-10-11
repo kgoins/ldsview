@@ -28,6 +28,8 @@ var rootCmd = &cobra.Command{
 			internal.PrintVersionInfo()
 			os.Exit(0)
 		}
+
+		cmd.Usage()
 	},
 }
 
