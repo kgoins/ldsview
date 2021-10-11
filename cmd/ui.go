@@ -5,18 +5,20 @@ import (
 	"os"
 	"sort"
 
-	ldsview "github.com/kgoins/ldsview/pkg"
+	"github.com/kgoins/ldapentity/entity"
+	"github.com/kgoins/ldifparser"
+	"github.com/kgoins/ldifparser/syntax"
 	"github.com/spf13/cobra"
 )
 
-func PrintAttribute(attr ldsview.EntityAttribute) {
-	for _, line := range attr.Stringify() {
+func PrintAttribute(attr entity.Attribute) {
+	for _, line := range ldifparser.StringifyAttribute(attr) {
 		fmt.Println(line)
 	}
 }
 
-func PrintEntity(entity ldsview.Entity, decodeTS bool) {
-	titleLine, err := ldsview.BuildTitleLine(entity)
+func PrintEntity(entity entity.Entity, decodeTS bool) {
+	titleLine, err := syntax.BuildTitleLine(entity)
 	if err != nil {
 		os.Stderr.WriteString("Skipping output of malformed object\n")
 		return
@@ -40,30 +42,33 @@ func PrintEntity(entity ldsview.Entity, decodeTS bool) {
 	fmt.Println()
 }
 
-// ChannelPrinter concurrently prints entity results and signals shared `done` channel
-// when finished
-func ChannelPrinter(entities chan ldsview.Entity, done chan bool, cmd *cobra.Command) {
-
+func ChannelPrinter(entities <-chan entity.Entity, done <-chan bool, cmd *cobra.Command) (printDone chan bool, err error) {
 	tdc, _ := cmd.Flags().GetBool("tdc")
 
 	printLimit, intParseErr := cmd.Flags().GetInt("first")
 	if intParseErr != nil {
-		fmt.Printf("Unable to parse value: %s\n", intParseErr.Error())
-		done <- true
+		err = fmt.Errorf("unable to parse value: %s\n", intParseErr.Error())
 		return
 	}
 
-	entCount := 0
+	printDone = make(chan bool)
 
-	for entity := range entities {
-		entCount = entCount + 1
+	go func() {
+		defer close(printDone)
 
-		PrintEntity(entity, tdc)
+		entCount := 0
+		for entity := range entities {
+			entCount = entCount + 1
 
-		if entCount == printLimit {
-			break
+			PrintEntity(entity, tdc)
+
+			if entCount == printLimit {
+				break
+			}
 		}
-	}
 
-	done <- true
+		printDone <- true
+	}()
+
+	return printDone, nil
 }
