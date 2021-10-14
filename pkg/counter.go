@@ -1,30 +1,26 @@
 package ldsview
 
 import (
-	"errors"
-	"os"
+	"github.com/kgoins/ldapentity/entity/ad"
+	"github.com/kgoins/ldifparser/entitybuilder"
+	"github.com/kgoins/ldsview/pkg/searcher"
 )
 
 // CountEntities returns the number of entities in the input file
-func (parser LdifParser) CountEntities() (count int, err error) {
-	Logger.Info("Opening ldif file: " + parser.filename)
-	dumpFile, err := os.Open(parser.filename)
-	if err != nil {
-		return
-	}
-	defer dumpFile.Close()
+func CountEntities(searcher searcher.LdapSearcher) (count int, err error) {
+	done := make(chan bool)
+	defer close(done)
 
-	Logger.Info("Finding first entity block")
-	entityScanner := parser.findFirstEntityBlock(dumpFile)
-	if entityScanner == nil {
-		return count, errors.New("Unable to find first entity block")
-	}
+	af := entitybuilder.NewAttributeFilter(ad.ATTR_DN)
+	eStream := searcher.ReadAllEntities(done, af)
 
-	for entityScanner.Scan() {
-		titleLine := entityScanner.Text()
-		if parser.isEntityTitle(titleLine) {
-			count++
+	for e := range eStream {
+		if e.Error != nil {
+			err = e.Error
+			return
 		}
+
+		count++
 	}
 
 	return

@@ -1,12 +1,13 @@
 package cmd
 
 import (
-	"fmt"
-	"strings"
+	"log"
 
-	"github.com/spf13/cobra"
+	filter "github.com/kgoins/entityfilter/entityfilter"
+	"github.com/kgoins/ldifparser/entitybuilder"
 	"github.com/kgoins/ldsview/internal"
-	ldsview "github.com/kgoins/ldsview/pkg"
+	"github.com/kgoins/ldsview/pkg/searcher"
+	"github.com/spf13/cobra"
 )
 
 var searchCmd = &cobra.Command{
@@ -25,63 +26,38 @@ Available conditions:
 Example: 
     ldsview search "objectclass:=computer,dnshostname:~net"
 	--> matches all computer objects with a hostname containing "net"`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		dumpFile, _ := cmd.Flags().GetString("file")
-		builder := ldsview.NewLdifParser(dumpFile)
-		filter, err := buildEntityFilter(cmd, args)
-		if err != nil {
-			fmt.Printf("Unable to parse filter\n")
-			return
+		hailmary, _ := cmd.Flags().GetBool("hailmary")
+		if hailmary {
+			log.Fatal("hailmary searches are currently disabled")
 		}
 
-		builder.SetEntityFilter(filter)
-		attrFilter := buildAttrFilter(cmd)
-		builder.SetAttributeFilter(attrFilter)
-
-		entities := make(chan ldsview.Entity)
-		done := make(chan bool)
-
-		// Start the printing goroutine
-		go ChannelPrinter(entities, done, cmd)
-
-		err = builder.BuildEntities(entities, done)
+		svcs, err := internal.BulidContainerFromFlags(cmd)
 		if err != nil {
-			fmt.Printf("Unable to parse file: %s\n", err.Error())
-			return
+			log.Fatal(err)
+		}
+		searcher := svcs.Get("ldapsearcher").(searcher.LdapSearcher)
+
+		filterStr := args[0]
+		entityFilter, err := filter.ParseFilterStr(filterStr)
+		if err != nil {
+			log.Fatal("Unable to parse entity filter: " + err.Error())
+		}
+
+		attrFilterParts, _ := cmd.Flags().GetStringSlice("include")
+		attrFilter := entitybuilder.NewAttributeFilter(attrFilterParts...)
+
+		done := make(chan bool)
+		defer close(done)
+
+		entities := searcher.SearchEntities(done, attrFilter, entityFilter)
+
+		err = ChannelPrinter(entities, cmd)
+		if err != nil {
+			log.Fatal(err)
 		}
 	},
-}
-
-func buildEntityFilter(cmd *cobra.Command, args []string) ([]ldsview.IEntityFilter, error) {
-	hailmary, _ := cmd.Flags().GetBool("hailmary")
-
-	var err error
-	var filter []ldsview.IEntityFilter
-
-	if len(args) < 1 {
-		return filter, nil
-	}
-	filterStr := args[0]
-
-	if hailmary {
-		filter = []ldsview.IEntityFilter{
-			ldsview.NewHailmaryFilter(filterStr),
-		}
-	} else {
-		filterParts := strings.Split(filterStr, ",")
-
-		filter, err = ldsview.BuildEntityFilter(filterParts)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return filter, nil
-}
-
-func buildAttrFilter(cmd *cobra.Command) internal.HashSetStr {
-	filterParts, _ := cmd.Flags().GetStringSlice("include")
-	return ldsview.BuildAttributeFilter(filterParts)
 }
 
 func init() {
@@ -96,11 +72,12 @@ func init() {
 		"Decodes timestamps to a human readable format",
 	)
 
+	// Disabled
 	searchCmd.PersistentFlags().BoolP(
 		"hailmary",
 		"m",
 		false,
-		"Filter term will be used in a broad search of multiple common attributes",
+		"(DISABLED) Filter term will be used in a broad search of multiple common attributes",
 	)
 
 	searchCmd.PersistentFlags().StringSliceP(

@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestLdifParser_CountEntities(t *testing.T) {
+func TestGetUniqueVals(t *testing.T) {
 	r := require.New(t)
 
 	testFile, err := os.Open(TESTFILE)
@@ -19,7 +19,7 @@ func TestLdifParser_CountEntities(t *testing.T) {
 	searcher := searcher.NewLdifSearcher(testFile)
 	r.NotNil(searcher)
 
-	count, err := ldsview.CountEntities(searcher)
+	vals, err := ldsview.GetUniqueValues(searcher, "sAMAccountType")
 	r.NoError(err)
-	r.Equal(count, NUMENTITIES)
+	r.Equal(1, len(vals))
 }

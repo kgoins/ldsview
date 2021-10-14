@@ -5,8 +5,9 @@ import (
 	"log"
 	"os"
 
+	"github.com/kgoins/ldsview/internal"
+	"github.com/kgoins/ldsview/pkg/searcher"
 	"github.com/spf13/cobra"
-	ldsview "github.com/kgoins/ldsview/pkg"
 )
 
 // entityCmd represents the entity command
@@ -14,37 +15,38 @@ var entityCmd = &cobra.Command{
 	Use:   "entity keyValue",
 	Short: "Extract an ldap object with a given attribute value",
 	Run: func(cmd *cobra.Command, args []string) {
-		dumpFile, _ := cmd.Flags().GetString("file")
+		svcs, err := internal.BulidContainerFromFlags(cmd)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		searcher := svcs.Get("ldapsearcher").(searcher.LdapSearcher)
 
 		keyAttr, _ := cmd.Flags().GetString("key-attr")
 		parseTdc, _ := cmd.Flags().GetBool("tdc")
-
-		ldifParser := ldsview.NewLdifParser(dumpFile)
-
-		filterParts, _ := cmd.Flags().GetStringSlice("include")
-		filter := ldsview.BuildAttributeFilter(filterParts)
-		ldifParser.SetAttributeFilter(filter)
-
 		inputList, _ := cmd.Flags().GetString("input-file")
+
+		// Get single entity
 		if inputList == "" {
 			if len(args) != 1 {
-				log.Fatalf("Key value must be specified")
+				log.Fatalf("key value must be specified")
 				return
 			}
 
 			keyValue := args[0]
-			execEntityCmd(ldifParser, keyAttr, keyValue, parseTdc)
+			execEntityCmd(searcher, keyAttr, keyValue, parseTdc)
 
 			return
 		}
 
+		// Get multiple entities from list in file
 		entityKeys, err := getEntityKeysFromInputFile(inputList)
 		if err != nil {
 			log.Fatalf("unable to read input file")
 		}
 
 		for _, key := range entityKeys {
-			execEntityCmd(ldifParser, keyAttr, key, parseTdc)
+			execEntityCmd(searcher, keyAttr, key, parseTdc)
 		}
 	},
 }
@@ -66,8 +68,8 @@ func getEntityKeysFromInputFile(inputListPath string) ([]string, error) {
 	return entityKeys, scanner.Err()
 }
 
-func execEntityCmd(ldifParser ldsview.LdifParser, keyAttr string, keyValue string, parseTdc bool) {
-	entity, err := ldifParser.BuildEntity(keyAttr, keyValue)
+func execEntityCmd(searcher searcher.LdapSearcher, keyAttr string, keyValue string, parseTdc bool) {
+	entity, err := searcher.ReadEntity(keyAttr, keyValue)
 	if err != nil {
 		log.Printf("%s\n", err.Error())
 		return
