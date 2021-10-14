@@ -34,8 +34,14 @@ func BuildContainer(confReader *viper.Viper) (di.Container, error) {
 			Scope: di.App,
 			Build: func(ctn di.Container) (interface{}, error) {
 				ldifFile := ctn.Get("ldiffile").(ldifparser.ReadSeekerAt)
+				buffsize := confReader.GetInt("buffersize")
 
-				s := searcher.NewLdifSearcher(ldifFile)
+				searcherConf := searcher.NewLdifSearcherConf()
+				if buffsize > 0 {
+					searcherConf.BufferSize = buffsize
+				}
+
+				s := searcher.NewLdifSearcher(ldifFile, searcherConf)
 				return s, nil
 			},
 		},

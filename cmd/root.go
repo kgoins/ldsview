@@ -70,4 +70,10 @@ func init() {
 		false,
 		"Print version information",
 	)
+
+	rootCmd.PersistentFlags().Int(
+		"buffersize",
+		0,
+		"controls the size of the read buffer used for ldif parsing",
+	)
 }
