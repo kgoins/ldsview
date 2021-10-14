@@ -8,6 +8,7 @@ import (
 	"github.com/kgoins/ldapentity/entity"
 	"github.com/kgoins/ldifparser"
 	"github.com/kgoins/ldifparser/syntax"
+	"github.com/kgoins/ldsview/pkg/searcher"
 	"github.com/spf13/cobra"
 )
 
@@ -38,7 +39,7 @@ func PrintEntity(entity entity.Entity, decodeTS bool) {
 	fmt.Println()
 }
 
-func ChannelPrinter(entities <-chan entity.Entity, cmd *cobra.Command) (err error) {
+func ChannelPrinter(entities <-chan searcher.EntityResult, cmd *cobra.Command) (err error) {
 	tdc, _ := cmd.Flags().GetBool("tdc")
 
 	printLimit, intParseErr := cmd.Flags().GetInt("first")
@@ -49,9 +50,12 @@ func ChannelPrinter(entities <-chan entity.Entity, cmd *cobra.Command) (err erro
 
 	entCount := 0
 	for entity := range entities {
-		entCount = entCount + 1
+		if entity.Error != nil {
+			return entity.Error
+		}
 
-		PrintEntity(entity, tdc)
+		entCount = entCount + 1
+		PrintEntity(entity.Entity, tdc)
 
 		if entCount == printLimit {
 			break
