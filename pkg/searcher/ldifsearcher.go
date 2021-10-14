@@ -16,9 +16,15 @@ type LdifSearcher struct {
 // Verify that LdifSearcher implements LdapSearcher
 var _ LdapSearcher = LdifSearcher{}
 
-func NewLdifSearcher(input ldifparser.ReadSeekerAt) LdifSearcher {
+func NewLdifSearcher(input ldifparser.ReadSeekerAt, conf ...LdifSearcherConf) LdifSearcher {
+
+	readerConf := ldifparser.NewReaderConf()
+	if len(conf) == 1 {
+		readerConf = buildLdifReaderConf(conf[0])
+	}
+
 	return LdifSearcher{
-		reader:  ldifparser.NewLdifReader(input),
+		reader:  ldifparser.NewLdifReader(input, readerConf),
 		matcher: NewLdapEntityMatcher(),
 	}
 }
