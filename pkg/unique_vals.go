@@ -16,7 +16,11 @@ func GetUniqueValues(searcher searcher.LdapSearcher, attrName string) ([]string,
 	valSet := hashset.NewStrHashset()
 
 	for entity := range results {
-		attr, found := entity.GetAttribute(attrName)
+		if entity.Error != nil {
+			return nil, entity.Error
+		}
+
+		attr, found := entity.Entity.GetAttribute(attrName)
 		if !found {
 			continue
 		}

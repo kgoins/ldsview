@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	hashset "github.com/kgoins/hashset/pkg"
-	"github.com/kgoins/ldapentity/entity"
 	"github.com/kgoins/ldifparser/entitybuilder"
 	"github.com/kgoins/ldsview/pkg/searcher"
 )
@@ -30,16 +29,18 @@ func GetStructure(searcher searcher.LdapSearcher) ([]string, error) {
 	defer close(done)
 
 	entities := searcher.ReadAllEntities(done, filter)
-	structure := buildStructureFromDNs(entities)
-
-	return structure, nil
+	return buildStructureFromDNs(entities)
 }
 
-func buildStructureFromDNs(entities <-chan entity.Entity) []string {
+func buildStructureFromDNs(entities <-chan searcher.EntityResult) ([]string, error) {
 	structure := hashset.NewStrHashset()
 
 	for e := range entities {
-		dn, found := e.GetDN()
+		if e.Error != nil {
+			return nil, e.Error
+		}
+
+		dn, found := e.Entity.GetDN()
 		if !found {
 			continue
 		}
@@ -48,5 +49,5 @@ func buildStructureFromDNs(entities <-chan entity.Entity) []string {
 		structure.Add(ouPath)
 	}
 
-	return structure.Values()
+	return structure.Values(), nil
 }

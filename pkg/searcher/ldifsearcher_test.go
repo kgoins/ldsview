@@ -53,7 +53,8 @@ func TestLdifSearcher_SearchEntities(t *testing.T) {
 
 	entities := []entity.Entity{}
 	for result := range resultStream {
-		entities = append(entities, result)
+		r.NoError(result.Error)
+		entities = append(entities, result.Entity)
 	}
 
 	r.Len(entities, 1)

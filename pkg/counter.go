@@ -14,7 +14,12 @@ func CountEntities(searcher searcher.LdapSearcher) (count int, err error) {
 	af := entitybuilder.NewAttributeFilter(ad.ATTR_DN)
 	eStream := searcher.ReadAllEntities(done, af)
 
-	for range eStream {
+	for e := range eStream {
+		if e.Error != nil {
+			err = e.Error
+			return
+		}
+
 		count++
 	}
 
