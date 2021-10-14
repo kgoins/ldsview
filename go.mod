@@ -8,7 +8,7 @@ require (
 	github.com/kgoins/entityfilter v1.0.0
 	github.com/kgoins/hashset v0.2.0
 	github.com/kgoins/ldapentity v0.1.0
-	github.com/kgoins/ldifparser v0.3.0
+	github.com/kgoins/ldifparser v0.3.2
 	github.com/kgoins/snakecharmer v0.1.0
 	github.com/magiconair/properties v1.8.4 // indirect
 	github.com/mitchellh/mapstructure v1.3.3 // indirect
