@@ -11,7 +11,7 @@ type LdapSearcher interface {
 
 	// The output channel is closed by the underlying reader when all entities
 	// have been read.
-	ReadAllEntities(done <-chan bool, af entitybuilder.AttributeFilter) <-chan entity.Entity
+	ReadAllEntities(done <-chan bool, af entitybuilder.AttributeFilter) <-chan EntityResult
 
 	// The output channel is closed by the underlying reader when all entities
 	// have been read. Sending a value over the done channel will interrupt the search.
@@ -19,5 +19,5 @@ type LdapSearcher interface {
 		done <-chan bool,
 		af entitybuilder.AttributeFilter,
 		ef filter.EntityFilter,
-	) <-chan entity.Entity
+	) <-chan EntityResult
 }
